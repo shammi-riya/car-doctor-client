@@ -1,5 +1,4 @@
-// import React from 'react';
-// import { useContext } from "react";
+
 import { HiArrowRight } from "react-icons/hi2";
 import { Link } from 'react-router-dom';
 

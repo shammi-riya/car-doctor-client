@@ -3,19 +3,33 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../Provider/AuthProvider";
 import BookingCard from "./BookingCard";
+import { useNavigate } from "react-router-dom";
 
 const Booking = () => {
     const {users} = useContext(AuthContext);
     const [bokkings,setBookings] = useState([])
+    const navigate = useNavigate()
 
     const url = `http://localhost:5000/bookings?email=${users.email}`;
 
 
     useEffect(()=>{
-      fetch(url)
+      fetch(url,{
+        method:"GET",
+        headers:{
+          authorization:`Bearer ${localStorage.getItem("Access-car-doctors-token")}`
+        }
+      })
       .then(res=>res.json())
-      .then(data=>setBookings(data))
-    },[])
+      .then(data=>{
+      
+        if(!data.error){
+          setBookings(data)
+        }else{
+          navigate("/")
+        }
+        })
+    },[url,navigate] )
 
     
   const handleDelete = (id)=>{

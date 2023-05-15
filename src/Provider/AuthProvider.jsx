@@ -1,11 +1,12 @@
 import  { createContext, useEffect, useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { GoogleAuthProvider, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
 import app from '../Firbase/Firbase.config';
 
 
 
 export const AuthContext = createContext()
 const auth = getAuth(app);
+const gogoolProvider = new GoogleAuthProvider()
 
 
 const AuthProvider = ({children}) => {
@@ -30,11 +31,40 @@ const AuthProvider = ({children}) => {
         setUsers(currentUser);
         console.log('current user', currentUser);
         setLoading(false);
+       if(currentUser){
+        const logdUser = {
+            email: currentUser.email
+        }
+        fetch("http://localhost:5000/jwt", {
+                    method: "POST",
+                    headers: {
+                        "content-type": "application/json"
+                    },
+                    body: JSON.stringify(logdUser)
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        localStorage.setItem("Access-car-doctors-token", data.token)
+                       
+                    })
+
+       }else{
+        localStorage.removeItem("Access-car-doctors-token")
+       }
+
     });
     return () => {
         return unsubscribe();
     }
 }, [])
+
+
+const siginInGogool = ()=>{
+    setLoading(true)
+  return   signInWithPopup(auth,gogoolProvider)
+}
+
+
 
 
 const logOut = ()=>{
@@ -48,6 +78,7 @@ const logOut = ()=>{
   loading,
   createUser,
   sighinIn,
+  siginInGogool ,
   logOut
  }
 
